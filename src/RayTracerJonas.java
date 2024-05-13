@@ -30,9 +30,14 @@ public class RayTracerJonas {
         double sRad = 0.5;
         int sphereColor = 0x7B0323;
         Sphere sphere = new Sphere(spherePos, sRad, sphereColor);
+
+
+
         Vec3 camPos = new Vec3(0.0, 0.0, 3.0);
         Camera camera = new Camera(camPos, (double) resX / resY);
-        Light light = new Light(new Vec3(5.0, 5.0, 10.0), 0xFFFFFF, 1.0);
+
+        Vec3 lightPos = new Vec3(5.0, 5.0, 10.0);
+        Light light = new Light(lightPos, 0xFFFFFF, 1.0);
 
         for (int y = 0; y < resY; ++y) {
             for (int x = 0; x < resX; ++x) {
