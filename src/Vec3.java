@@ -25,6 +25,14 @@ public class Vec3 {
         return new Vec3(x / length, y / length, z / length);
     }
 
+    public Vec3 cross(Vec3 other) {
+        return new Vec3(
+                this.y * other.z - this.z * other.y,
+                this.z * other.x - this.x * other.z,
+                this.x * other.y - this.y * other.x
+        );
+    }
+
     public double dot(Vec3 other) {
         return x * other.x + y * other.y + z * other.z;
     }
@@ -36,4 +44,5 @@ public class Vec3 {
     public double distance(Vec3 other) {
         return subtract(other).length();
     }
+
 }
