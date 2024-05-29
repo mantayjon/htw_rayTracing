@@ -12,7 +12,7 @@ public class RayTracerJonas {
 
     public static void main(String[] args) {
         int resX = 1024;
-        int resY = 768;
+        int resY = 800;
 
 
         int[] pixels = new int[resX * resY];
@@ -38,15 +38,15 @@ public class RayTracerJonas {
         int sphereColor2 = 0x316729;
         Sphere sphere2 = new Sphere(spherePos2, sRad2, sphereColor2);
 
-        Vec3 spherePos3 = new Vec3(1.0, 2.0, -1.0);
+        Vec3 spherePos3 = new Vec3(1.0, 2.0, -3.0);
         double sRad3 = 0.5;
         int sphereColor3 = 0xFFFFFF;
         Sphere sphere3 = new Sphere(spherePos3, sRad3, sphereColor3);
 
         List<Sphere> spheres = new ArrayList<>();
         spheres.add(sphere);
-        //spheres.add(sphere2);
-        //spheres.add(sphere3);
+        spheres.add(sphere2);
+        spheres.add(sphere3);
 
 
         Vec3 camPos = new Vec3(0.0, 0.0, 3.0);
@@ -73,8 +73,6 @@ public class RayTracerJonas {
         mis.newPixels();
     }
 
-
-
     private static int getColorForPixel(Vec3 camPos, Vec3 direction, List<Sphere> spheres, List<Light> lights) {
         Sphere closestSphere = null;
         double minS = Double.POSITIVE_INFINITY;
@@ -85,10 +83,12 @@ public class RayTracerJonas {
 
         // Find the closest sphere and its hit point
         for (Sphere sphere : spheres) {
-            Vec3 toSphere = sphere.centerPoint.subtract(camPos);
+            Vec3 toSphere = camPos.subtract(sphere.centerPoint); //
+
             double a = direction.dot(direction);
             double b = 2.0 * direction.dot(toSphere);
             double c = toSphere.dot(toSphere) - sphere.radius * sphere.radius;
+
             double discriminant = b * b - 4 * a * c;
 
             if (discriminant >= 0) {
@@ -99,33 +99,24 @@ public class RayTracerJonas {
                 if (s < minS && s > 0) {
                     minS = s;
                     closestSphere = sphere;
-                    hitPoint = camPos.add(direction.scale(s));
-                    normal = hitPoint.subtract(sphere.centerPoint).normalize();
                 }
             }
         }
 
         if (closestSphere == null) {
-            return background;  // Background color
+            return background;
         }
 
         double red = 0;
         double green = 0;
         double blue = 0;
 
+        hitPoint = camPos.add(direction.scale(minS)); //in sphere klasse implememtieren
+        normal = hitPoint.subtract(closestSphere.centerPoint).normalize(); //unten implementieren
+
         for (Light light : lights) {
             Vec3 lightDir = light.position.subtract(hitPoint).normalize();
-
-            System.out.println("LightDir: " + lightDir.x + " " + lightDir.y + " " + lightDir.z);
-            System.out.println("Light Position: " + light.position.x + " " + light.position.y + " " + light.position.z);
-            System.out.println("Hit Point: " + hitPoint.x + " " + hitPoint.y + " " + hitPoint.z);
-            System.out.println("Normal: " + normal.x + " " + normal.y + " " + normal.z);
-            System.out.println("");
-
             double diffuse = Math.max(normal.dot(lightDir), 0) * light.intensity;
-
-            System.out.println("Diffuse: " + diffuse);
-
             red += (closestSphere.color >> 16 & 0xFF) * diffuse;
             green += (closestSphere.color >> 8 & 0xFF) * diffuse;
             blue += (closestSphere.color & 0xFF) * diffuse;
